@@ -20,6 +20,8 @@ results = model.val()
 # # Export the model to ONNX format
 # success = model.export(format='onnx')
 
+# yolo task=detect mode=train model=F:\project\zz-python\python-ai\yolo\test_train\my_yolov8.yaml data=F:\project\zz-python\python-ai\yolo\test_train\my_coco128.yaml epochs=3 batch=1
+
 
 
 
