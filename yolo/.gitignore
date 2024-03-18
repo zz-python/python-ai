@@ -25,6 +25,7 @@ venv/
 ENV/
 yolo_env/
 *.pt
+*.onnx
 
 # IDE-specific files
 .vscode/
