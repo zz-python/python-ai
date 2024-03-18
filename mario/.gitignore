@@ -1,0 +1,69 @@
+# .gitignore
+
+# Python-specific files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyc
+
+# Django-specific files
+*.log
+db.sqlite3
+*.sqlite3
+*.db
+*.sqlite
+*.pyc
+*.pyo
+*.pyd
+
+# Secret key file
+secret_key.txt
+
+# Virtual environment
+venv/
+ENV/
+
+# IDE-specific files
+.vscode/
+.idea/
+
+# Miscellaneous
+*.DS_Store
+*.bak
+*.swp
+*.swo
+*.class
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.sqlite
+*.log
+*.pot
+*.mo
+*.egg-info/
+dist/
+build/
+*.egg-info
+*.egg
+*.rpm
+*.deb
+*.gz
+*.tar.gz
+*.tar.bz2
+*.zip
+*.rar
+*.tar
+*.exe
+*.dll
+*.so
+*.lib
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.sqlite
+*.log
