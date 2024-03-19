@@ -4,10 +4,12 @@ from ultralytics import YOLO
 # model = YOLO('F:\\project\\zz-python\\python-ai\\yolo\\test_train\\my_yolov8.yaml')
  
 # Load a pretrained YOLO model (recommended for training)
-model = YOLO('F:\\project\\zz-python\\python-ai\\yolo\\model\\yolov8n.pt')
+# model = YOLO('F:\\project\\zz-python\\python-ai\\yolo\\model\\yolov8n.pt')
+model = YOLO('F:\\project\\zz-python\\python-ai\\yolo\\test_train\\yolov8n.yaml')
  
 # ultralytics-main\ultralytics\cfg\datasets\coco128.yaml
-results = model.train(data='F:\\project\\zz-python\\python-ai\\yolo\\test_train\\my_coco128.yaml', epochs=3)
+# results = model.train(data='F:\\project\\zz-python\\python-ai\\yolo\\test_train\\my_coco128.yaml', epochs=3)
+results = model.train(data='F:\\project\\zz-python\\python-ai\\yolo\\test_train\\coco128.yaml', epochs=3)
  
 # Evaluate the model's performance on the validation set
 results = model.val()

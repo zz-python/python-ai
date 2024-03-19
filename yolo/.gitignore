@@ -26,6 +26,7 @@ ENV/
 yolo_env/
 *.pt
 *.onnx
+test_train/datasets
 
 # IDE-specific files
 .vscode/
