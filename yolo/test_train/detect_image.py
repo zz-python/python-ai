@@ -9,6 +9,7 @@ asset_path = Path('../assets').resolve()
 
 # 加载预训练模型 task参数也可以不填写，它会根据模型去识别相应任务类别
 model = YOLO(model_path / "best.pt", task='detect')
+# model = YOLO(model_path / "yolov8n.pt", task='detect')
 # 检测图片
 # results = model(asset_path / "cat1.jpg")
 # results = model(asset_path / "cat2.jpg")
