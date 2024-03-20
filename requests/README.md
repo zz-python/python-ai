@@ -1,7 +1,9 @@
-python -m venv venv  
-venv\Scripts\activate  
+python -m venv venv
+venv\Scripts\activate
 
-url_picture δ���
+url_picture：截图url网页整体图像  
+https://chromedriver.chromium.org/downloads 下载chromedriver.exe放到平级目录  
+根据实际的版本下载 https://storage.googleapis.com/chrome-for-testing-public/123.0.6312.59/win64/chromedriver-win64.zip  
 pip install selenium pillow
 
 ```
@@ -25,5 +27,5 @@ urllib3           2.2.1
 wsproto           1.2.0
 ```
 
-url_img
+url_img：爬取url关联的img图像  
 pip install requests beautifulsoup4
