@@ -1,11 +1,11 @@
 from ultralytics import YOLO
 
 # Load a model
-model = YOLO('./train2/weights/best.pt')  # load an official model
+model = YOLO('./train/weights/best.pt')  # load an official model
 # model = YOLO('path/to/best.pt')  # load a custom model
 
 # Predict with the model 1804.png 2869.png
-results = model('./testImage/3.png',save=True,project="./")  # predict on an image
+results = model('./testImage/1804.png',save=True,project="./")  # predict on an image
 
 """
 
