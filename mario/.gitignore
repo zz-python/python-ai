@@ -22,6 +22,7 @@ secret_key.txt
 
 # Virtual environment
 venv/
+venv2/
 ENV/
 
 # IDE-specific files
