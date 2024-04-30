@@ -99,6 +99,51 @@ def window_move():
     window.moveTo(100, 100)  # 移动到 x=100, y=100 的位置
     print(window.left, window.top)
 
+def windowshot():
+    window = gw.getWindowsWithTitle('test.txt - 记事本')[0]
+    window.activate()
+    window.moveTo(100, 100)  # 移动到 x=100, y=100 的位置
+    while True:
+        print(window.left, window.top, window.size.width, window.size.height)
+        screenshot = ImageGrab.grab(bbox=(window.left, window.top, window.left + window.size.width, window.top + window.size.height))
+        img = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2GRAY)
+
+        template = cv2.imread('images/template.png', 0)
+        res = cv2.matchTemplate(img, template, cv2.TM_CCOEFF_NORMED)
+        # 获取最大匹配值和对应位置
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+        threshold = 0.8
+        if (max_val < threshold):
+            print("no find")
+        else: 
+            top_left = max_loc
+            # print("template.shape", template.shape)
+            # 获取模板图像的宽度和高度
+            w, h = template.shape[::-1]
+            bottom_right = (top_left[0] + w, top_left[1] + h)
+            cv2.rectangle(img, top_left, bottom_right, (0, 255, 255), 2)
+
+            # 文字
+            text = f'Max Value: {max_val}'
+            position = max_loc  # 文字的起始位置
+            font = cv2.FONT_HERSHEY_SIMPLEX  # 字体
+            font_scale = 1  # 字号缩放比例
+            color = (0, 255, 0)  # 文字颜色，格式为 (B, G, R)
+            thickness = 2  # 文字粗细
+            cv2.putText(img, text, position, font, font_scale, color, thickness)
+
+            # window.activate()
+            # pyautogui.typewrite("Hello, World!", interval=0)
+
+        cv2.imshow('detect', img)
+        key = cv2.waitKey(30) & 0xFF
+        if key == ord('q'):
+            print("break")
+            cv2.destroyAllWindows()
+            break
+        else:
+            print("continue")
+
 
 if __name__ == "__main__":
     # screenshot_window(0, 0, 500, 500)
@@ -107,4 +152,5 @@ if __name__ == "__main__":
     # screenshot_cv_template()
     # screenshot_cv_mouseMove(0, 0, 600, 600)
     # get_window_handles()
-    window_move()
+    # window_move()
+    windowshot()
