@@ -87,9 +87,17 @@ def screenshot_cv_mouseMove(x1, y1, x2, y2):
             print("continue")
 
 def get_window_handles():
-    window_handles = gw.getAllTitles()
+    # https://www.jb51.net/python/306392bbb.htm
+    window_handles = gw.getWindowsWithTitle('')
     for handle in window_handles:
         print(handle)
+
+def window_move():
+    window = gw.getWindowsWithTitle('test.txt - 记事本')[0]
+    print(window.size, window.size.width, window.size.height)   # 获取窗口大小
+    print(window.left, window.top)  # 获取窗口左上角位置
+    window.moveTo(100, 100)  # 移动到 x=100, y=100 的位置
+    print(window.left, window.top)
 
 
 if __name__ == "__main__":
@@ -97,5 +105,6 @@ if __name__ == "__main__":
     # screenshot_cv(0, 0, 500, 500)
     # mouseMove()
     # screenshot_cv_template()
-    screenshot_cv_mouseMove(0, 0, 600, 600)
+    # screenshot_cv_mouseMove(0, 0, 600, 600)
     # get_window_handles()
+    window_move()
