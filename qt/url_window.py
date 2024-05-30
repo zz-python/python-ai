@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout, QTableWidget, QTableWidgetItem, QComboBox
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout, QTableWidget, QTableWidgetItem, QComboBox, QTextBrowser
 from PySide6 import QtGui
 from PySide6.QtGui import QPixmap
 from pathlib import Path
@@ -8,12 +8,16 @@ import os
 # 不然每次YOLO处理都会输出调试信息
 os.environ['YOLO_VERBOSE'] = 'False'
 from ultralytics import YOLO 
+import easyocr
 
 img_save_path = Path('./assets/img').resolve()
 db_path = Path('./assets/db/dns.db').resolve()
 model_path = Path('./assets/model').resolve()
 
 class UrlWindow(QWidget):
+
+    reader = None
+
     def __init__(self):
         super().__init__()
         self.setupUI()
@@ -27,14 +31,18 @@ class UrlWindow(QWidget):
         self.path_input = QLineEdit(self)
         self.load_button = QPushButton("加载图片", self)
         self.combo_box = QComboBox()
-        self.combo_box.addItems(["yolov8n.pt", "yolov8s.pt", "best.pt", "best2.pt"])
-        self.yolo_button = QPushButton("分析图片", self)
+        self.combo_box.addItems(["yolov8n.pt", "yolov8s.pt", "yolov8m.pt", "yolov8l.pt", "yolov8x.pt", "best.pt", "best1000.pt"])
+        self.yolo_button = QPushButton("图像检测", self)
+        self.ocr_button = QPushButton("文字检测", self)
 
         self.table_widget = QTableWidget()
+        self.table_widget.setFixedWidth(250)
         self.image_origin_label = QLabel(self)
         self.image_origin_label.setFixedSize(200, 150)
+        self.textLog = QTextBrowser()
+        self.textLog.setFixedHeight(150)
         self.image_yolo_label = QLabel(self)
-        self.image_yolo_label.setFixedSize(700, 400)
+        self.image_yolo_label.setFixedSize(900, 500)
 
         picture_path = str(img_save_path) + "\\0.png" # bus.jpg
         
@@ -46,20 +54,34 @@ class UrlWindow(QWidget):
         input_layout.addWidget(self.load_button)
         input_layout.addWidget(self.combo_box)
         input_layout.addWidget(self.yolo_button)
+        input_layout.addWidget(self.ocr_button)
 
-        images_layout = QHBoxLayout()
-        images_layout.addWidget(self.table_widget)
-        images_layout.addWidget(self.image_origin_label)
-        images_layout.addWidget(self.image_yolo_label)
+        content_right_top_layout = QHBoxLayout()
+        content_right_top_layout.addWidget(self.image_origin_label)
+        content_right_top_layout.addWidget(self.textLog )
+
+        content_right_layout = QVBoxLayout()
+        content_right_layout.addLayout(content_right_top_layout)
+        content_right_layout.addWidget(self.image_yolo_label)
+
+        # log_layout = QVBoxLayout()
+        # log_layout.addWidget(self.image_origin_label)
+        # log_layout.addWidget(self.textLog )
+
+        content_layout = QHBoxLayout()
+        content_layout.addWidget(self.table_widget)
+        content_layout.addLayout(content_right_layout)
+
 
         layout.addLayout(input_layout)
-        layout.addLayout(images_layout)
+        layout.addLayout(content_layout)
         self.setLayout(layout)
 
         # 连接按钮点击信号到槽函数
         self.load_button.clicked.connect(self.show_image)
         # self.combo_box.currentIndexChanged.connect(self.on_combobox_changed)
         self.yolo_button.clicked.connect(self.yolo_image)
+        self.ocr_button.clicked.connect(self.ocr_image)
         self.table_widget.cellClicked.connect(self.cell_clicked)
 
     def load_data(self):
@@ -109,7 +131,8 @@ class UrlWindow(QWidget):
             self.image_origin_label.setScaledContents(True)
         else:
             print(f"File '{file_path}' does not exist.")
-            image_path = "F:\\project\\zz-python\\python-ai\\qt\\assets\\img\\0.png"
+            # image_path = "F:\\project\\zz-python\\python-ai\\qt\\assets\\img\\0.png"
+            image_path = str(img_save_path) + "\\0.png"
             pixmap = QPixmap(image_path)
             self.image_origin_label.setPixmap(pixmap)
             self.image_origin_label.setScaledContents(True)       
@@ -140,3 +163,20 @@ class UrlWindow(QWidget):
         qt_img = QtGui.QImage(rgb_image.data, w, h, bytes_per_line, QtGui.QImage.Format_RGB888)
         self.image_yolo_label.setPixmap(QtGui.QPixmap.fromImage(qt_img))
         self.image_yolo_label.setScaledContents(True)
+
+    def ocr_image(self):
+        image_path = self.path_input.text()
+        img = cv2.imread(image_path)
+        if self.reader is None:
+            print("create reader")
+            self.reader = easyocr.Reader(['ch_sim', 'en']) # 'en'
+        # 使用 EasyOCR 进行 OCR
+        result = self.reader.readtext(img)
+        # 打印识别结果
+        self.textLog.clear()
+        for detection in result:
+            # print(detection[1])
+            self.textLog.append(detection[1])
+
+    def show_and_trigger_method(self):
+        self.load_data()
