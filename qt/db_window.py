@@ -2,6 +2,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButt
 from PySide6 import QtGui
 from PySide6.QtGui import QPixmap
 from pathlib import Path
+from datetime import datetime
 import sqlite3
 
 
@@ -28,7 +29,6 @@ class DbWindow(QWidget):
 
         self.textLog = QTextBrowser()
 
-        self.path_input.setText("baidu.com")
         # 设置布局
         layout = QVBoxLayout()
         input_layout = QHBoxLayout()
@@ -53,7 +53,7 @@ class DbWindow(QWidget):
         # 连接到数据库
         conn = sqlite3.connect(str(db_path))
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM domain')
+        cursor.execute('SELECT * FROM domain ORDER BY update_time DESC')
         rows = cursor.fetchall()
 
         # 获取列名
@@ -80,10 +80,19 @@ class DbWindow(QWidget):
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS domain (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name varchar(255),
+                name TEXT,
+                update_time TEXT,
                 tag INTEGER
-            )
+            );
+            CREATE UNIQUE INDEX idx_name ON "domain" (name);
+            CREATE INDEX idx_update_time ON domain (update_time);
         ''')
+        # cursor.execute('''
+        #     CREATE UNIQUE INDEX idx_name ON "domain" (name);
+        # ''')
+        # cursor.execute('''
+        #     CREATE INDEX idx_update_time ON domain (update_time);
+        # ''')
         conn.commit()
         conn.close()
         self.textLog.append("初始化数据库成功。")
@@ -95,9 +104,9 @@ class DbWindow(QWidget):
 
         # 插入数据
         cursor.execute('''
-            INSERT INTO domain (name, tag)
-            VALUES (?, ?)
-        ''', (name, 0))
+            REPLACE INTO domain (name, tag, update_time)
+            VALUES (?, ?, ?)
+        ''', (name, 0, datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
 
         # cursor.execute('''
         #     INSERT INTO users (name, age)

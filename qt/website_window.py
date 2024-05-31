@@ -52,7 +52,7 @@ class WebsiteWindow(QWidget):
         # 连接到数据库
         conn = sqlite3.connect(str(db_path))
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM domain')
+        cursor.execute('SELECT * FROM domain ORDER BY update_time DESC')
         rows = cursor.fetchall()
 
         # 获取列名
