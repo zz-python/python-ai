@@ -7,7 +7,14 @@ import shutil
 
 
 assets_path = Path('./assets').resolve()
+# 图片目录
+img_dir = Path('./assets/img_coco128').resolve()
+# 图片拆分后数据集目录
+split_dir = Path('./assets/img_split').resolve()
+# 模型目录
+model_dir = Path('./assets/model').resolve()
 
+# https://blog.csdn.net/weixin_44878336/article/details/138316279
 class TrainWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -49,7 +56,7 @@ class TrainWindow(QWidget):
         random.seed(42)
 
         # 拆分后数据集目录
-        split_dir = str(assets_path) + '\\img_split'
+        # split_dir = str(assets_path) + '\\img_split'
         os.makedirs(os.path.join(split_dir, 'train/images'), exist_ok=True)
         os.makedirs(os.path.join(split_dir, 'train/labels'), exist_ok=True)
         os.makedirs(os.path.join(split_dir, 'valid/images'), exist_ok=True)
@@ -58,7 +65,7 @@ class TrainWindow(QWidget):
         os.makedirs(os.path.join(split_dir, 'test/labels'), exist_ok=True)
 
         # 获取图片文件列表
-        combined_files = self.get_combined_files(os.path.join(root_dir, 'img_coco128'))
+        combined_files = self.get_combined_files(str(img_dir))
         # print("combined_files", combined_files)
         # 随机打乱文件列表
         random.shuffle(combined_files)
@@ -74,24 +81,40 @@ class TrainWindow(QWidget):
         # 将图片和标签文件移动到相应的目录
         for i, (image_file, label_file) in enumerate(zip(image_files_shuffled, label_files_shuffled)):
             if i < train_bound:
-                shutil.copy(os.path.join(root_dir, 'img_coco128', image_file), os.path.join(split_dir, 'train/images', image_file))
-                shutil.copy(os.path.join(root_dir, 'img_coco128', label_file), os.path.join(split_dir, 'train/labels', label_file))
+                shutil.copy(os.path.join(img_dir, image_file), os.path.join(split_dir, 'train/images', image_file))
+                shutil.copy(os.path.join(img_dir, label_file), os.path.join(split_dir, 'train/labels', label_file))
             elif i < valid_bound:
-                shutil.copy(os.path.join(root_dir, 'img_coco128', image_file), os.path.join(split_dir, 'valid/images', image_file))
-                shutil.copy(os.path.join(root_dir, 'img_coco128', label_file), os.path.join(split_dir, 'valid/labels', label_file))
+                shutil.copy(os.path.join(img_dir, image_file), os.path.join(split_dir, 'valid/images', image_file))
+                shutil.copy(os.path.join(img_dir, label_file), os.path.join(split_dir, 'valid/labels', label_file))
             else:
-                shutil.copy(os.path.join(root_dir, 'img_coco128', image_file), os.path.join(split_dir, 'test/images', image_file))
-                shutil.copy(os.path.join(root_dir, 'img_coco128', label_file), os.path.join(split_dir, 'test/labels', label_file))
+                shutil.copy(os.path.join(img_dir, image_file), os.path.join(split_dir, 'test/images', image_file))
+                shutil.copy(os.path.join(img_dir, label_file), os.path.join(split_dir, 'test/labels', label_file))
         print("dir_image finish")
+        self.textLog.append("归档成功。")
 
     def train_image(self):
-        print("train_image")
-        model = YOLO('F:\\project\\zz-python\\python-ai\\yolo\\test_train\\yolov8n.yaml')
-        results = model.train(data='F:\\project\\zz-python\\python-ai\\yolo\\test_train\\coco128.yaml', epochs=1)
+        self.textLog.append("开始训练。")
+        # model = YOLO('F:\\project\\zz-python\\python-ai\\yolo\\test_train\\yolov8n.yaml')
+        model = YOLO(os.path.join(model_dir, 'yolov8n.yaml'))
+
+        # 设置训练参数
+        train_params = {
+            'data': os.path.join(model_dir, 'coco128.yaml'),
+            'epochs': 1,
+            'project': os.path.join(model_dir, 'detect'),
+            'name': 'train'
+        }
+        results = model.train(**train_params)
+        # results = model.train(data='F:\\project\\zz-python\\python-ai\\yolo\\test_train\\coco128.yaml', epochs=1)
         print("train_image results", results)
         # Evaluate the model's performance on the validation set
         results = model.val()
-        print("train_image over", results)
+        # metrics = model.val()  # no arguments needed, dataset and settings remembered
+        # metrics.box.map  # map50-95
+        # metrics.box.map50  # map50
+        # metrics.box.map75  # map75
+        # metrics.box.maps  # a list contains map50-95 of each category
+        self.textLog.append("完成训练。")
 
     def list_files_with_extension(self, directory, extension):
         # 获取目录中的所有文件和子目录
