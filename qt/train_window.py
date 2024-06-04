@@ -25,7 +25,11 @@ class TrainWindow(QWidget):
         self.resize(1600, 900)
 
         self.dir_image_button = QPushButton("图片归档", self)
+        train_times_label = QLabel("训练次数")
+        self.train_times_input = QLineEdit(self)
+        self.train_times_input.setText("1")
         self.train_button = QPushButton("开始训练", self)
+        self.export_button = QPushButton("模型导出", self)
 
         self.textLog = QTextBrowser()
 
@@ -33,7 +37,10 @@ class TrainWindow(QWidget):
         layout = QVBoxLayout()
         input_layout = QHBoxLayout()
         input_layout.addWidget(self.dir_image_button)
+        input_layout.addWidget(train_times_label)
+        input_layout.addWidget(self.train_times_input)
         input_layout.addWidget(self.train_button)
+        input_layout.addWidget(self.export_button)
 
 
         layout.addLayout(input_layout)
@@ -43,6 +50,7 @@ class TrainWindow(QWidget):
         # 连接按钮点击信号到槽函数
         self.dir_image_button.clicked.connect(self.dir_image)
         self.train_button.clicked.connect(self.train_image)
+        self.export_button.clicked.connect(self.export_model)
 
     def dir_image(self):
         # 原数据集目录
@@ -94,16 +102,18 @@ class TrainWindow(QWidget):
 
     def train_image(self):
         self.textLog.append("开始训练。")
+        self.textLog.append(os.path.join(model_dir, 'detect'))
         # model = YOLO('F:\\project\\zz-python\\python-ai\\yolo\\test_train\\yolov8n.yaml')
         model = YOLO(os.path.join(model_dir, 'yolov8n.yaml'))
 
         # 设置训练参数
         train_params = {
             'data': os.path.join(model_dir, 'coco128.yaml'),
-            'epochs': 1,
+            'epochs': int(self.train_times_input.text()),
             'project': os.path.join(model_dir, 'detect'),
             'name': 'train'
         }
+        # callbacks=[self.on_epoch_end]
         results = model.train(**train_params)
         # results = model.train(data='F:\\project\\zz-python\\python-ai\\yolo\\test_train\\coco128.yaml', epochs=1)
         print("train_image results", results)
@@ -115,6 +125,10 @@ class TrainWindow(QWidget):
         # metrics.box.map75  # map75
         # metrics.box.maps  # a list contains map50-95 of each category
         self.textLog.append("完成训练。")
+
+    def on_epoch_end(self, epoch, metrics):
+        print(f'Epoch [{epoch}/{self.total_epochs}] - Loss: {metrics["loss"]:.4f}, mAP: {metrics["mAP"]:.4f}')
+        self.textLog.append(f'Epoch [{epoch}/{self.total_epochs}] - Loss: {metrics["loss"]:.4f}, mAP: {metrics["mAP"]:.4f}')
 
     def list_files_with_extension(self, directory, extension):
         # 获取目录中的所有文件和子目录
@@ -134,6 +148,10 @@ class TrainWindow(QWidget):
                     merged_list.append((file.name, txt_file.name))
         # print("merged_list", merged_list)
         return merged_list
+
+    def export_model(self):
+        model = YOLO(os.path.join(model_dir, 'yolov8n.pt'))
+        model.export(format='onnx') # , simplify=True
 
 # if __name__ == "__main__":
 #     window = TrainWindow()
