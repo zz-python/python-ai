@@ -153,6 +153,17 @@ class UrlWindow(QWidget):
         image_path = self.path_input.text()
         results = self.model(image_path)
         
+        # 解析结果并打印详细信息
+        for result in results:
+            boxes = result.boxes
+            for box in boxes:
+                x1, y1, x2, y2 = box.xyxy[0]  # 获取检测框的坐标
+                confidence = box.conf[0]  # 获取置信度
+                class_id = box.cls[0]  # 获取类别 ID
+                class_name = self.model.names[int(class_id)]  # 获取类别名称
+                print(f"Detected object: class={class_id} {class_name}, confidence={confidence:.2f}, "
+                    f"box=({x1:.2f}, {y1:.2f}, {x2:.2f}, {y2:.2f})")
+
         img = results[0].plot()   
         # cv2.imshow("YOLOv8 Inference", img)
 
