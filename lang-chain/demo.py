@@ -3,6 +3,7 @@
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI
+from util.config import config
 
 # 1. 定义提示词模板 (Prompt)
 prompt = ChatPromptTemplate.from_messages([
@@ -14,7 +15,7 @@ prompt = ChatPromptTemplate.from_messages([
 # 注意: 需要设置环境变量 OPENAI_API_KEY，或在这里传入 openai_api_key="your-key"
 model = ChatOpenAI(
     base_url="https://api.deepseek.com",  # DeepSeek API 地址
-    api_key="sk-xx",        # 替换成你的真实密钥
+    api_key=config.OPENAI_API_KEY,        # 替换成你的真实密钥
     model="deepseek-v4-pro",                    # DeepSeek 模型名称
     temperature=0.7,                          # 控制随机性，0-1之间
 )
