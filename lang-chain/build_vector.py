@@ -1,21 +1,24 @@
 # pip langchain_community install langchain_chroma
-from langchain_community.document_loaders import DirectoryLoader
-from langchain_community.document_loaders import TextLoader
+from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
-from langchain_community.embeddings import HuggingFaceBgeEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
+from pathlib import Path
 
 # 1. 加载 Markdown 文件
-loader = DirectoryLoader(
-    "./docs",
-    glob="**/*.md",
-    loader_cls=TextLoader,
-    loader_kwargs={
-        "encoding": "utf-8"
-    }
-)
-
-documents = loader.load()
+documents = []
+for file in Path("./docs").rglob("*.md"):
+    content = file.read_text(
+        encoding="utf-8"
+    )
+    documents.append(
+        Document(
+            page_content=content,
+            metadata={
+                "source": str(file)
+            }
+        )
+    )
 
 print(
     "Markdown数量:",
@@ -75,7 +78,6 @@ print("Markdown知识库创建完成")
 #     query_texts=[
 #         "什么是 Python?"
 #     ],
-#     n_results=3
+#     n_results=10
 # )
-
 # print(result)
