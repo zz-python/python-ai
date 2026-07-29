@@ -1,8 +1,9 @@
-# pip langchain_community install langchain_chroma
+import os
+os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
 from pathlib import Path
 
 # 1. 加载 Markdown 文件
@@ -53,17 +54,17 @@ print(
 )
 
 # 3. Embedding
-# embedding = HuggingFaceBgeEmbeddings(
-#     model_name="BAAI/bge-small-zh-v1.5"
-# )
+embedding = HuggingFaceEmbeddings(
+    model_name="BAAI/bge-small-zh-v1.5"
+)
 
 
 # 4. 创建 Chroma
 vectorstore = Chroma.from_documents(
     documents=docs,
-    # embedding=embedding,
+    embedding=embedding,
     persist_directory="./chroma_db",
-    collection_name="markdown_knowledge"
+    collection_name="markdown_knowledge_zh"
 )
 
 print("Markdown知识库创建完成")

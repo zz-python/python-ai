@@ -1,22 +1,24 @@
 import os
+os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
+from langchain_huggingface import HuggingFaceEmbeddings
 from dotenv import load_dotenv
 from langchain_chroma import Chroma
-from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
+from util.config import config
 
 load_dotenv()
 
 # 1. 加载Embedding
-# embedding = HuggingFaceBgeEmbeddings(
-#     model_name="BAAI/bge-small-zh-v1.5"
-# )
+embedding = HuggingFaceEmbeddings(
+    model_name="BAAI/bge-small-zh-v1.5"
+)
 
 # 2. 加载Chroma
 vectorstore = Chroma(
     persist_directory="./chroma_db",
-    collection_name="markdown_knowledge",
-    # embedding_function=embedding
+    collection_name="markdown_knowledge_zh",
+    embedding_function=embedding
 )
 
 # 3. Retriever
@@ -29,7 +31,7 @@ retriever = vectorstore.as_retriever(
 # 4. DeepSeek
 llm = ChatOpenAI(
     base_url="https://api.deepseek.com",  # DeepSeek API 地址
-    api_key="sk-xx",        # 替换成你的真实密钥
+    api_key=config.OPENAI_API_KEY,        # 替换成你的真实密钥
     model="deepseek-v4-pro",                    # DeepSeek 模型名称
     temperature=0.7,                          # 控制随机性，0-1之间
 )
