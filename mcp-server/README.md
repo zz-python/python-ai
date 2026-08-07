@@ -28,5 +28,4 @@ python server-sse.py
     }
   }
 }
-"
 ```

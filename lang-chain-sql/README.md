@@ -9,3 +9,7 @@
 ## 运行程序
 
 python main.py
+
+## 提供MCP能力
+
+python server-sse.py
